@@ -14,22 +14,29 @@ const Cores = {
   borda: '#e0e0e0',
   statusPendente: '#FFA726', // Laranja
   statusConcluido: '#66BB6A', // Verde
+  statusFinalizado: '#42A5F5', // Azul
 };
 
 // --- DADOS DE EXEMPLO DAS MINHAS DOACOES ---
 const DADOS_MINHAS_DOACOES = [
-  { id: '1', item: 'Notebook antigo', status: 'Coletado', data: '28/09/2025' },
-  { id: '2', item: 'Celular e carregadores', status: 'Aguardando Coleta', data: '05/10/2025' },
-  { id: '3', item: 'Monitor LCD', status: 'Finalizado', data: '15/09/2025' },
+  { id: '1', item: 'Monitor LCD 22"', status: 'Coletado', data: '28/09/2025' },
+  { id: '2', item: 'Notebook antigo Dell', status: 'Aguardando Coleta', data: '05/10/2025' },
+  { id: '3', item: 'Celular e carregadores', status: 'Finalizado', data: '15/09/2025' },
 ];
 
 // --- Componente para renderizar cada doação na lista ---
-const ItemMinhaDoacao = ({ item, status, data }) => {
+// MUDANÇA A: O item agora recebe uma propriedade "onPress"
+const ItemMinhaDoacao = ({ item, status, data, onPress }) => {
   // Define a cor do status da doação
-  const corStatus = status === 'Aguardando Coleta' ? Cores.statusPendente : Cores.statusConcluido;
+  let corStatus = Cores.statusPendente;
+  if (status === 'Coletado') {
+    corStatus = Cores.statusConcluido;
+  } else if (status === 'Finalizado') {
+    corStatus = Cores.statusFinalizado;
+  }
 
   return (
-    <TouchableOpacity style={styles.itemContainer}>
+    <TouchableOpacity style={styles.itemContainer} onPress={onPress}>
       <View style={[styles.statusIndicator, { backgroundColor: corStatus }]} />
       <View style={styles.infoItem}>
         <Text style={styles.itemTitulo}>{item}</Text>
@@ -43,7 +50,8 @@ const ItemMinhaDoacao = ({ item, status, data }) => {
 };
 
 // --- Componente Principal da Tela ---
-export default function PainelDoadorScreen() {
+// MUDANÇA B: A tela agora recebe o objeto "navigation" como propriedade
+export default function PainelDoadorScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -61,7 +69,13 @@ export default function PainelDoadorScreen() {
         {/* Lista de Minhas Doações */}
         <FlatList
           data={DADOS_MINHAS_DOACOES}
-          renderItem={({ item }) => <ItemMinhaDoacao {...item} />}
+          // MUDANÇA C: Ao renderizar cada item, passamos a função de navegação para o "onPress"
+          renderItem={({ item }) => (
+            <ItemMinhaDoacao 
+              {...item} 
+              onPress={() => navigation.navigate('DetalhesDoacao', { doacaoId: item.id })}
+            />
+          )}
           keyExtractor={item => item.id}
           style={styles.lista}
         />

@@ -4,7 +4,7 @@ import React from 'react';
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, SafeAreaView } from 'react-native';
 import { FontAwesome, FontAwesome5, Feather } from '@expo/vector-icons';
 
-// --- Paleta de Cores (importada mentalmente do App.js) ---
+// --- Paleta de Cores ---
 const Cores = {
   verdePrincipal: '#2E7D32',
   textoPrincipal: '#333',
@@ -23,7 +23,8 @@ const DADOS_DOACOES = [
 ];
 
 // --- Componente para renderizar cada item da lista ---
-const ItemDoacao = ({ id, doador, item, distancia, data, onPress }) => (
+// MUDANÇA A: O item agora recebe uma propriedade "onPress"
+const ItemDoacao = ({ doador, item, distancia, data, onPress }) => (
   <TouchableOpacity style={styles.itemContainer} onPress={onPress}>
     <View style={styles.iconeItem}>
       <Feather name="package" size={24} color={Cores.verdePrincipal} />
@@ -39,25 +40,9 @@ const ItemDoacao = ({ id, doador, item, distancia, data, onPress }) => (
   </TouchableOpacity>
 );
 
-// O componente principal agora recebe { navigation }
-export default function PainelCooperadoraScreen({ navigation }) {
-  // ... (o resto da função fica igual) ...
-        <FlatList
-          data={DADOS_DOACOES}
-          renderItem={({ item }) => (
-            <ItemDoacao 
-              {...item} 
-              onPress={() => navigation.navigate('DetalhesDoacao', { doacaoId: item.id })}
-            />
-          )}
-          keyExtractor={item => item.id}
-          style={styles.lista}
-        />
-  // ... (o resto da função e os estilos ficam iguais) ...
-}
-
 // --- Componente Principal da Tela ---
-export default function PainelCooperadoraScreen() {
+// MUDANÇA B: A tela agora recebe o objeto "navigation" como propriedade
+export default function PainelCooperadoraScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -84,7 +69,13 @@ export default function PainelCooperadoraScreen() {
         {/* Lista de Doações */}
         <FlatList
           data={DADOS_DOACOES}
-          renderItem={({ item }) => <ItemDoacao {...item} />}
+          // MUDANÇA C: Ao renderizar cada item, passamos a função de navegação para o "onPress"
+          renderItem={({ item }) => (
+            <ItemDoacao 
+              {...item} 
+              onPress={() => navigation.navigate('DetalhesDoacao', { doacaoId: item.id })}
+            />
+          )}
           keyExtractor={item => item.id}
           style={styles.lista}
         />
